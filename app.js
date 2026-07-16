@@ -1,6 +1,7 @@
 const express = require('express');
 const app = express();
 const port = process.env.PORT || 3000;
+const AWS_ACCESS_KEY_ID = "AKIAIOSFODNN7EXAMPLE";
 
 app.get('/', (req, res) => {
     res.json({
