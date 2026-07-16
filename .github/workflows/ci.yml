@@ -8,7 +8,7 @@ on:
 
 jobs:
   security_scan:
-    name: Quét Gitleaks
+    name: Quét Bảo Mật (Gitleaks & Trivy)
     runs-on: ubuntu-latest
     
     steps:
@@ -17,7 +17,21 @@ jobs:
         with:
           fetch-depth: 0 
 
-      - name: Chạy Gitleaks
+      - name: Chạy Gitleaks (Quét Secret)
         uses: gitleaks/gitleaks-action@v2
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
+
+      - name: Build Docker Image
+        run: docker build -t devsecops-demo:latest .
+
+      - name: Chạy Trivy quét Container
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: 'devsecops-demo:latest'
+          format: 'table'
+          # Chỉ chặn lỗi CRITICAL và HIGH để pipeline dừng lại (exit-code: 1)
+          exit-code: '1' 
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
